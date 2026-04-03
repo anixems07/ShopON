@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - ShopEase</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <a class="nav-logo" href="index.html">
+                <i class="fa-solid fa-basket-shopping"></i> ShopEase
+            </a>
+            <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="orders.html"><i class="fa-solid fa-box-open"></i> Orders</a>
+        </div>
+        <div class="nav-right">
+            <a href="cart.html" class="active cart-icon-wrapper">
+                <i class="fa-solid fa-cart-shopping"></i> Cart
+            </a>
+            <a href="login.html"><i class="fa-solid fa-user"></i> Login</a>
+            <button id="themeToggle" class="theme-btn" title="Toggle Dark Mode">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="products-title">Shopping Cart</h1>
+        <div class="cart-container">
+            <div id="cart" class="cart-items-wrapper">
+                <!-- Cart items will be loaded here -->
+            </div>
+            
+            <div class="cart-summary">
+                <h2 style="font-size: 1.25em; margin-bottom: 20px;">Order Summary</h2>
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="cartSubtotal">₹0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping Estimate</span>
+                    <span>Free</span>
+                </div>
+                <div class="summary-row">
+                    <span>Tax Estimate</span>
+                    <span id="cartTax">₹0</span>
+                </div>
+                <div class="summary-row summary-total">
+                    <span>Total</span>
+                    <span id="cartTotal">₹0</span>
+                </div>
+                <button id="checkoutBtn" class="checkout-btn">
+                    Proceed to Checkout <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script for handling UI and API logic -->
+    <script src="js/auth.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/theme.js"></script>
+</body>
+</html>

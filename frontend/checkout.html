@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - ShopEase</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <a class="nav-logo" href="index.html">
+                <i class="fa-solid fa-basket-shopping"></i> ShopEase
+            </a>
+            <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i> Cart</a>
+            <a href="orders.html"><i class="fa-solid fa-box-open"></i> Orders</a>
+        </div>
+        <div class="nav-right">
+            <a href="login.html"><i class="fa-solid fa-user"></i> Login</a>
+            <button id="themeToggle" class="theme-btn" title="Toggle Dark Mode">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="products-title">Secure Checkout</h1>
+        
+        <form id="checkoutForm">
+            <div class="checkout-wrapper">
+                <!-- Left Side: Shipping -->
+                <div class="checkout-card">
+                    <h2><i class="fa-solid fa-truck-fast"></i> Shipping Address</h2>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Full Name</label>
+                            <input type="text" id="fullName" placeholder="Rahul Sharma" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Street Address</label>
+                            <input type="text" id="street" placeholder="123 Shopping Avenue, Block C" required>
+                        </div>
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" id="city" placeholder="Mumbai" required>
+                        </div>
+                        <div class="form-group">
+                            <label>State</label>
+                            <select id="state" required>
+                                <option value="">Select State</option>
+                                <option value="MH">Maharashtra</option>
+                                <option value="DL">Delhi</option>
+                                <option value="KA">Karnataka</option>
+                                <option value="TN">Tamil Nadu</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>ZIP / PIN Code</label>
+                            <input type="text" id="zip" placeholder="400001" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mobile Number</label>
+                            <input type="tel" id="mobile" placeholder="+91 9876543210" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side: Payment & Summary -->
+                <div class="checkout-actions">
+                    <div class="checkout-card">
+                        <h2><i class="fa-solid fa-credit-card"></i> Payment Method</h2>
+                        
+                        <label class="payment-method-box">
+                            <input type="radio" name="paymentMethod" value="cash_on_delivery" checked>
+                            <div class="method-info">
+                                <strong>Cash on Delivery (COD)</strong>
+                                <span>Pay at your doorstep.</span>
+                            </div>
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                        </label>
+
+                        <label class="payment-method-box">
+                            <input type="radio" name="paymentMethod" value="online_upi">
+                            <div class="method-info">
+                                <strong>Online Payment (UPI)</strong>
+                                <span>Pay instantly via GPay, PhonePe, Paytm.</span>
+                            </div>
+                            <i class="fa-solid fa-qrcode"></i>
+                        </label>
+
+                        <!-- Hidden by default, shown when UPI is selected -->
+                        <div id="upiInputSection" style="display: none;">
+                            <div class="form-group">
+                                <label>Enter UPI ID</label>
+                                <input type="text" id="upiId" placeholder="example@ybl or mobile@paytm">
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 24px;">
+                            <div class="summary-row summary-total">
+                                <span>Total to Pay</span>
+                                <span id="displayTotal">₹0</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="place-order-btn">
+                            Place Order <i class="fa-solid fa-check"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Script -->
+    <script src="js/auth.js"></script>
+    <script src="js/checkout.js"></script>
+    <script src="js/theme.js"></script>
+</body>
+</html>

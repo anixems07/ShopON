@@ -1,0 +1,20 @@
+```mermaid
+erDiagram
+    Users ||--o{ Addresses : "has"
+    Users ||--o{ Orders : "places"
+    Users ||--o{ Cart : "has"
+    Users ||--o{ Wishlist : "has"
+    Users ||--o{ Reviews : "writes"
+    Users ||--o{ Coupon_Usage : "uses"
+    Categories ||--o{ Products : "contains"
+    Products ||--|| Inventory : "has"
+    Products ||--o{ Order_Items : "included in"
+    Products ||--o{ Cart : "added to"
+    Products ||--o{ Wishlist : "added to"
+    Products ||--o{ Reviews : "has"
+    Orders ||--o{ Order_Items : "contains"
+    Orders ||--|| Payments : "has"
+    Orders ||--o{ Coupon_Usage : "uses"
+    Addresses ||--o{ Orders : "used for"
+    Coupons ||--o{ Coupon_Usage : "applied to"
+```
