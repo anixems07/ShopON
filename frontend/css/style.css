@@ -273,7 +273,7 @@ body {
     position: relative;
     width: 100%;
     height: 200px;
-    background: #F0FAFB;
+    background: var(--light-blue-bg);
     overflow: hidden;
     flex-shrink: 0;
 }
@@ -616,7 +616,7 @@ body {
     border-radius: var(--radius-sm);
     font-size: 0.97em;
     transition: all 0.2s;
-    background: #FAFFFE;
+    background: var(--bg-card);
     color: var(--text-main);
 }
 
@@ -670,7 +670,7 @@ body {
 }
 
 #upiInputSection {
-    background: #F0FDFB;
+    background: var(--light-blue-bg);
     padding: 18px;
     border-radius: var(--radius-sm);
     margin-top: 10px;
