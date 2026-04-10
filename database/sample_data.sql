@@ -6,15 +6,13 @@ USE ecommerce;
 INSERT INTO Categories (name, description) VALUES
 ('Electronics', 'Electronic gadgets and devices'),
 ('Clothing', 'Apparel and fashion items'),
-('Books', 'Books and publications'),
-('Home & Garden', 'Home improvement and garden supplies');
+('Books', 'Books and publications');
 
 -- Insert Products
 INSERT INTO Products (name, description, price, category_id, image_url) VALUES
 ('Laptop', 'High-performance laptop', 83000.00, 1, 'laptop.jpg'),
 ('T-Shirt', 'Cotton t-shirt', 1660.00, 2, 'tshirt.jpg'),
 ('Novel Book', 'Bestselling novel', 1250.00, 3, 'novel.jpg'),
-('Garden Hose', 'Durable garden hose', 2490.00, 4, 'hose.jpg'),
 ('Smartphone', 'Latest smartphone', 58100.00, 1, 'phone.jpg'),
 ('Jeans', 'Denim jeans', 4150.00, 2, 'jeans.jpg');
 
@@ -23,7 +21,6 @@ INSERT INTO Inventory (product_id, quantity) VALUES
 (1, 50),
 (2, 100),
 (3, 200),
-(4, 30),
 (5, 75),
 (6, 80);
 

@@ -7,17 +7,38 @@ let filteredProducts = [];
 const dummyProducts = [
     { product_id: 'd1', name: 'Premium Wireless Headphones', description: 'Noise-canceling over-ear headphones with 40h battery life.', price: 12500, category: 'Electronics', rating: 4.8, reviews: 342, image_url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80' },
     { product_id: 'd2', name: 'MacBook Pro 16"', description: 'M2 Max Chip, 32GB RAM, 1TB SSD for ultimate performance.', price: 235000, category: 'Electronics', rating: 4.9, reviews: 1024, image_url: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&q=80' },
-    { product_id: 'd3', name: 'Sony PlayStation 5', description: 'Next-gen gaming console with ultra-high speed SSD.', price: 49990, category: 'Electronics', rating: 4.9, reviews: 2011, image_url: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=500&q=80' },
+    { product_id: 'd3', name: 'Sony PlayStation 5', description: 'Next-gen gaming console with ultra-high speed SSD.', price: 49990, category: 'Electronics', rating: 4.9, reviews: 2011, image_url: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=500&q=80' },
     { product_id: 'd4', name: 'Cotton Summer T-Shirt', description: 'Breathable, 100% organic cotton classic fit t-shirt.', price: 999, category: 'Clothing', rating: 4.2, reviews: 85, image_url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80' },
     { product_id: 'd5', name: 'Denim Jacket Classic', description: 'Vintage style rugged denim jacket for everyday wear.', price: 3450, category: 'Clothing', rating: 4.6, reviews: 112, image_url: 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=500&q=80' },
     { product_id: 'd6', name: 'Men\'s Running Sneakers', description: 'Lightweight and durable athletic shoes for marathon runners.', price: 4200, category: 'Clothing', rating: 4.4, reviews: 540, image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80' },
     { product_id: 'd7', name: 'Leather Crossbody Bag', description: 'Handcrafted genuine leather bag with adjustable strap.', price: 5600, category: 'Accessories', rating: 4.7, reviews: 67, image_url: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=500&q=80' },
-    { product_id: 'd8', name: 'Minimalist Wristwatch', description: 'Sleek stainless steel quartz watch with a black dial.', price: 2150, category: 'Accessories', rating: 4.5, reviews: 890, image_url: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=500&q=80' },
-    { product_id: 'd9', name: 'Ray-Ban Aviator Sunglasses', description: 'Iconic polarized sunglasses with gold frames.', price: 8500, category: 'Accessories', rating: 4.8, reviews: 120, image_url: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=500&q=80' },
+    { product_id: 'd8', name: 'Minimalist Wristwatch', description: 'Sleek stainless steel quartz watch with a black dial.', price: 2150, category: 'Accessories', rating: 4.5, reviews: 890, image_url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80' },
+    { product_id: 'd9', name: 'Ray-Ban Aviator Sunglasses', description: 'Iconic polarized sunglasses with gold frames.', price: 8500, category: 'Accessories', rating: 4.8, reviews: 120, image_url: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=500&q=80' },
     { product_id: 'd10', name: 'Smart Fitness Tracker', description: 'Track your heart rate, sleep, and daily activities.', price: 3200, category: 'Electronics', rating: 4.1, reviews: 450, image_url: 'https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=500&q=80' },
     { product_id: 'd11', name: 'Winter Knitted Beanie', description: 'Warm and cozy wool beanie for cold weather.', price: 550, category: 'Clothing', rating: 4.0, reviews: 34, image_url: 'https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=500&q=80' },
-    { product_id: 'd12', name: 'Gold Pendant Necklace', description: '18K gold-plated delicate pendant necklace.', price: 1800, category: 'Accessories', rating: 4.3, reviews: 55, image_url: 'https://images.unsplash.com/photo-1599643477873-ce96de952fdf?w=500&q=80' }
+    { product_id: 'd12', name: 'Gold Pendant Necklace', description: '18K gold-plated delicate pendant necklace.', price: 1800, category: 'Accessories', rating: 4.3, reviews: 55, image_url: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=500&q=80' }
 ];
+
+// Global Image Mapping for consistency across all pages
+const productImages = {
+    'Laptop': 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&q=80',
+    'T-Shirt': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80',
+    'Novel Book': 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=800&q=80',
+    'Smartphone': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&q=80',
+    'Jeans': 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&q=80',
+    'Premium Wireless Headphones': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80',
+    'MacBook Pro 16"': 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&q=80',
+    'Sony PlayStation 5': 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=800&q=80',
+    'Cotton Summer T-Shirt': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80',
+    'Denim Jacket Classic': 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=800&q=80',
+    'Men\'s Running Sneakers': 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80',
+    'Leather Crossbody Bag': 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=80',
+    'Minimalist Wristwatch': 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80',
+    'Ray-Ban Aviator Sunglasses': 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&q=80',
+    'Smart Fitness Tracker': 'https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80',
+    'Winter Knitted Beanie': 'https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=800&q=80',
+    'Gold Pendant Necklace': 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80'
+};
 
 async function loadProducts() {
     try {
@@ -31,20 +52,21 @@ async function loadProducts() {
                 category: p.category || 'Electronics',
                 rating: 4.0 + Math.random(),
                 reviews: Math.floor(Math.random() * 200) + 10,
-                // Fallback realistic placeholder if missing
-                image_url: (p.image_url && p.image_url !== 'placeholder.jpg') 
-                            ? 'images/' + p.image_url 
-                            : `https://picsum.photos/seed/${p.product_id}/500`
+                // Use global mapping for all products
+                image_url: productImages[p.name] || 
+                          ((p.image_url && p.image_url.startsWith('http')) 
+                            ? p.image_url 
+                            : `https://picsum.photos/seed/${p.product_id}/500`)
             }));
         }
 
         // Combine DB Products with our Rich Dummy Products to make the store look full
-        allProducts = [...dbProducts, ...dummyProducts];
+        allProducts = [...dbProducts, ...dummyProducts].filter(p => p.name !== 'Garden Hose');
         
         applyFilters(); 
     } catch(err) {
         console.error('Failed to load DB products. Showing dummies.', err);
-        allProducts = [...dummyProducts];
+        allProducts = [...dummyProducts].filter(p => p.name !== 'Garden Hose');
         applyFilters();
     }
 }

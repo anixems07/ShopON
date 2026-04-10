@@ -10,6 +10,7 @@ export default (db) => {
         SELECT p.*, c.name AS category 
         FROM Products p 
         LEFT JOIN Categories c ON p.category_id = c.category_id
+        WHERE p.name <> 'Garden Hose'
       `);
       res.json(rows);
     } catch (error) {
@@ -26,7 +27,7 @@ export default (db) => {
         SELECT p.*, c.name AS category 
         FROM Products p 
         LEFT JOIN Categories c ON p.category_id = c.category_id 
-        WHERE p.product_id = ?
+        WHERE p.product_id = ? AND p.name <> 'Garden Hose'
       `, [id]);
       if (rows.length === 0) {
         return res.status(404).json({ error: 'Product not found.' });

@@ -39,7 +39,8 @@ CREATE TABLE Products (
     price DECIMAL(10,2) NOT NULL CHECK (price > 0),
     category_id INT,
     image_url VARCHAR(500),
-    FOREIGN KEY (category_id) REFERENCES Categories(category_id) ON DELETE SET NULL
+    FOREIGN KEY (category_id) REFERENCES Categories(category_id) ON DELETE SET NULL,
+    CONSTRAINT chk_no_garden_hose CHECK (name <> 'Garden Hose')
 );
 
 -- Inventory Table

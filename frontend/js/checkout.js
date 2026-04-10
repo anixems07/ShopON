@@ -3,6 +3,11 @@ const displayTotal = document.getElementById('displayTotal');
 const paymentRadios = document.getElementsByName('paymentMethod');
 const upiInputSection = document.getElementById('upiInputSection');
 const upiIdInput = document.getElementById('upiId');
+const cardInputSection = document.getElementById('cardInputSection');
+const cardNumberInput = document.getElementById('cardNumber');
+const cardHolderInput = document.getElementById('cardHolder');
+const cardExpiryInput = document.getElementById('cardExpiry');
+const cardCvvInput = document.getElementById('cardCvv');
 const token = localStorage.getItem('token');
 
 // Load total from cart
@@ -15,12 +20,35 @@ paymentRadios.forEach(radio => {
         if (radio.value === 'online_upi') {
             upiInputSection.style.display = 'block';
             upiIdInput.setAttribute('required', 'true');
+            cardInputSection.style.display = 'none';
+            removeCardRequired();
+        } else if (radio.value === 'CARD') {
+            upiInputSection.style.display = 'none';
+            upiIdInput.removeAttribute('required');
+            cardInputSection.style.display = 'block';
+            addCardRequired();
         } else {
             upiInputSection.style.display = 'none';
             upiIdInput.removeAttribute('required');
+            cardInputSection.style.display = 'none';
+            removeCardRequired();
         }
     });
 });
+
+function addCardRequired() {
+    cardNumberInput.setAttribute('required', 'true');
+    cardHolderInput.setAttribute('required', 'true');
+    cardExpiryInput.setAttribute('required', 'true');
+    cardCvvInput.setAttribute('required', 'true');
+}
+
+function removeCardRequired() {
+    cardNumberInput.removeAttribute('required');
+    cardHolderInput.removeAttribute('required');
+    cardExpiryInput.removeAttribute('required');
+    cardCvvInput.removeAttribute('required');
+}
 
 checkoutForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -29,7 +57,21 @@ checkoutForm.addEventListener('submit', async (e) => {
     const street = document.getElementById('street').value;
     const city = document.getElementById('city').value;
     const paymentMethodValue = document.querySelector('input[name="paymentMethod"]:checked').value;
-    const paymentProviderInfo = paymentMethodValue === 'online_upi' ? upiIdInput.value : 'COD';
+    
+    let paymentProviderInfo = 'COD';
+    let cardDetails = null;
+
+    if (paymentMethodValue === 'online_upi') {
+        paymentProviderInfo = upiIdInput.value;
+    } else if (paymentMethodValue === 'CARD') {
+        cardDetails = {
+            cardNumber: cardNumberInput.value.replace(/\s/g, ''),
+            cardHolder: cardHolderInput.value,
+            expiry: cardExpiryInput.value,
+            cvv: cardCvvInput.value
+        };
+        paymentProviderInfo = 'CARD';
+    }
 
     let successMessage = "Order placed successfully!";
 
@@ -64,7 +106,8 @@ checkoutForm.addEventListener('submit', async (e) => {
                 body: JSON.stringify({ 
                     address_id: 1, // hardcoded per previous simple implementation
                     payment_method: paymentMethodValue, 
-                    payment_provider: paymentProviderInfo 
+                    payment_provider: paymentProviderInfo,
+                    card_details: cardDetails
                 })
             });
             

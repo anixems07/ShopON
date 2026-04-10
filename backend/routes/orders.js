@@ -7,11 +7,22 @@ export default (db, authenticateToken) => {
 
   // POST /orders/place — call stored procedure to place order & process payment
   router.post('/place', async (req, res) => {
-    const { address_id, payment_method, payment_provider } = req.body;
+    const { address_id, payment_method, payment_provider, card_details } = req.body;
     const user_id = req.user.user_id;
 
     if (!address_id || !payment_method) {
       return res.status(400).json({ error: 'address_id and payment_method are required.' });
+    }
+
+    // Basic Validation for CARD payment
+    if (payment_method === 'CARD') {
+      if (!card_details || !card_details.cardNumber || !card_details.cardHolder || !card_details.expiry || !card_details.cvv) {
+        return res.status(400).json({ error: 'All card details are required for CARD payment.' });
+      }
+      // Simple format check (simulation)
+      if (card_details.cardNumber.length < 13 || card_details.cvv.length < 3) {
+        return res.status(400).json({ error: 'Invalid card format.' });
+      }
     }
 
     try {
@@ -31,10 +42,16 @@ export default (db, authenticateToken) => {
 
       const total_amount = orderRows[0].total_amount;
 
+      // Handle payment provider for CARD (mask card number)
+      let finalPaymentProvider = payment_provider || null;
+      if (payment_method === 'CARD' && card_details) {
+        finalPaymentProvider = `Card ending in ${card_details.cardNumber.slice(-4)}`;
+      }
+
       // Call ProcessPayment stored procedure
       await db.execute(
         'CALL ProcessPayment(?, ?, ?, ?)',
-        [order_id, payment_method, payment_provider || null, total_amount]
+        [order_id, payment_method, finalPaymentProvider, total_amount]
       );
 
       res.status(201).json({ message: 'Order placed successfully.', order_id });

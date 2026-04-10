@@ -5,6 +5,27 @@ const cartTaxEl = document.getElementById('cartTax');
 const cartTotalEl = document.getElementById('cartTotal');
 const token = localStorage.getItem('token');
 
+// Global Image Mapping for consistency (Shared with products.js)
+const productImages = {
+    'Laptop': 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&q=80',
+    'T-Shirt': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80',
+    'Novel Book': 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=800&q=80',
+    'Smartphone': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&q=80',
+    'Jeans': 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&q=80',
+    'Premium Wireless Headphones': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80',
+    'MacBook Pro 16"': 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&q=80',
+    'Sony PlayStation 5': 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=800&q=80',
+    'Cotton Summer T-Shirt': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80',
+    'Denim Jacket Classic': 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=800&q=80',
+    'Men\'s Running Sneakers': 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80',
+    'Leather Crossbody Bag': 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=80',
+    'Minimalist Wristwatch': 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80',
+    'Ray-Ban Aviator Sunglasses': 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&q=80',
+    'Smart Fitness Tracker': 'https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800&q=80',
+    'Winter Knitted Beanie': 'https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=800&q=80',
+    'Gold Pendant Necklace': 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80'
+};
+
 // We mix dummyCart from local storage with real DB cart
 async function loadCart() {
     let allCartItems = [];
@@ -20,10 +41,11 @@ async function loadCart() {
                 allCartItems = dbCart.map(c => ({
                     ...c,
                     type: 'real',
-                    // Only use image_url if it's a real HTTP URL; otherwise use picsum fallback
-                    image_url: (c.image_url && c.image_url.startsWith('http'))
+                    // Use shared image mapping for consistency
+                    image_url: productImages[c.name] || 
+                                ((c.image_url && c.image_url.startsWith('http'))
                                 ? c.image_url
-                                : `https://picsum.photos/seed/${c.product_id}/500`
+                                : `https://picsum.photos/seed/${c.product_id}/500`)
                 }));
             }
         } catch (err) {
@@ -34,10 +56,16 @@ async function loadCart() {
     // 2. Add Dummy Cart items from localStorage
     const dummyCart = JSON.parse(localStorage.getItem('dummyCart') || '[]');
     dummyCart.forEach(item => {
-        allCartItems.push({ ...item, type: 'dummy' });
+        if (item.name === 'Garden Hose') return;
+        // Ensure dummy items also use the latest mapped images
+        allCartItems.push({ 
+            ...item, 
+            type: 'dummy',
+            image_url: productImages[item.name] || item.image_url 
+        });
     });
 
-    renderCart(allCartItems);
+    renderCart(allCartItems.filter(c => c.name !== 'Garden Hose'));
 }
 
 function renderCart(cartItems) {
