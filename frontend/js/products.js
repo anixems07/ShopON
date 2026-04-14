@@ -60,8 +60,13 @@ async function loadProducts() {
             }));
         }
 
-        // Combine DB Products with our Rich Dummy Products to make the store look full
-        allProducts = [...dbProducts, ...dummyProducts].filter(p => p.name !== 'Garden Hose');
+        // Logged-in users should add only real DB products so cart persists in MySQL.
+        if (token) {
+            allProducts = [...dbProducts].filter(p => p.name !== 'Garden Hose');
+        } else {
+            // Guests can still browse a richer mixed catalog.
+            allProducts = [...dbProducts, ...dummyProducts].filter(p => p.name !== 'Garden Hose');
+        }
         
         applyFilters(); 
     } catch(err) {
@@ -165,8 +170,9 @@ async function addToCart(product_id) {
         return;
     }
     
-    // For dummy products without real backend IDs, we'll store them in localStorage
+    // For dummy products without real backend IDs, keep them as guest-only demo items.
     if (typeof product_id === 'string' && product_id.startsWith('d')) {
+        alert('This is a demo-only item. Please add real catalog products to save into your database cart.');
         let dummyCart = JSON.parse(localStorage.getItem('dummyCart') || '[]');
         const product = dummyProducts.find(p => p.product_id === product_id);
         if (product) {

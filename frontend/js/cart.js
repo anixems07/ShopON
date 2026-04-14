@@ -53,17 +53,18 @@ async function loadCart() {
         }
     }
 
-    // 2. Add Dummy Cart items from localStorage
-    const dummyCart = JSON.parse(localStorage.getItem('dummyCart') || '[]');
-    dummyCart.forEach(item => {
-        if (item.name === 'Garden Hose') return;
-        // Ensure dummy items also use the latest mapped images
-        allCartItems.push({ 
-            ...item, 
-            type: 'dummy',
-            image_url: productImages[item.name] || item.image_url 
+    // 2. Add dummy items only for guest sessions.
+    if (!token) {
+        const dummyCart = JSON.parse(localStorage.getItem('dummyCart') || '[]');
+        dummyCart.forEach(item => {
+            if (item.name === 'Garden Hose') return;
+            allCartItems.push({
+                ...item,
+                type: 'dummy',
+                image_url: productImages[item.name] || item.image_url
+            });
         });
-    });
+    }
 
     renderCart(allCartItems.filter(c => c.name !== 'Garden Hose'));
 }
