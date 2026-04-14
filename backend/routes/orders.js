@@ -74,7 +74,24 @@ export default (db, authenticateToken) => {
          ORDER BY o.order_date DESC`,
         [user_id]
       );
-      res.json(rows);
+      const ordersWithItems = await Promise.all(rows.map(async (order) => {
+        const [itemRows] = await db.execute(
+          `SELECT oi.order_item_id, p.name, p.image_url, oi.quantity, oi.price AS price,
+                  (oi.quantity * oi.price) AS subtotal
+           FROM Order_Items oi
+           JOIN Products p ON oi.product_id = p.product_id
+           WHERE oi.order_id = ?
+           ORDER BY oi.order_item_id ASC`,
+          [order.order_id]
+        );
+
+        return {
+          ...order,
+          items: itemRows
+        };
+      }));
+
+      res.json(ordersWithItems);
     } catch (error) {
       console.error('DB error in GET /orders:', error.message);
       res.status(500).json({ error: 'Failed to fetch orders.' });
@@ -107,6 +124,37 @@ export default (db, authenticateToken) => {
     } catch (error) {
       console.error(`DB error in GET /orders/${id}:`, error.message);
       res.status(500).json({ error: 'Failed to fetch order details.' });
+    }
+  });
+
+  // PATCH /orders/:id/cancel — cancel a user-owned order
+  router.patch('/:id/cancel', async (req, res) => {
+    const { id } = req.params;
+    const user_id = req.user.user_id;
+
+    try {
+      const [orderRows] = await db.execute(
+        'SELECT order_id, status FROM Orders WHERE order_id = ? AND user_id = ?',
+        [id, user_id]
+      );
+
+      if (orderRows.length === 0) {
+        return res.status(404).json({ error: 'Order not found.' });
+      }
+
+      if (String(orderRows[0].status).toLowerCase() === 'cancelled') {
+        return res.json({ message: 'Order is already cancelled.' });
+      }
+
+      await db.execute(
+        'UPDATE Orders SET status = ? WHERE order_id = ? AND user_id = ?',
+        ['cancelled', id, user_id]
+      );
+
+      res.json({ message: 'Order cancelled successfully.' });
+    } catch (error) {
+      console.error(`DB error in PATCH /orders/${id}/cancel:`, error.message);
+      res.status(500).json({ error: 'Failed to cancel order.' });
     }
   });
 

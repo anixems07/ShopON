@@ -22,7 +22,7 @@ export default (db, authenticateToken) => {
       const [[userCount]] = await db.execute('SELECT COUNT(*) AS total_users FROM Users');
       const [[orderCount]] = await db.execute('SELECT COUNT(*) AS total_orders FROM Orders');
       const [[revenue]] = await db.execute(
-        "SELECT IFNULL(SUM(total_amount), 0) AS total_revenue FROM Orders WHERE status != 'Cancelled'"
+        "SELECT IFNULL(SUM(total_amount), 0) AS total_revenue FROM Orders WHERE status != 'cancelled'"
       );
 
       res.json({
