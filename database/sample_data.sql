@@ -16,14 +16,6 @@ INSERT INTO Products (name, description, price, category_id, image_url) VALUES
 ('Smartphone', 'Latest smartphone', 58100.00, 1, 'phone.jpg'),
 ('Jeans', 'Denim jeans', 4150.00, 2, 'jeans.jpg');
 
--- Insert Inventory
-INSERT INTO Inventory (product_id, quantity) VALUES
-(1, 50),
-(2, 100),
-(3, 200),
-(5, 75),
-(6, 80);
-
 -- Insert Users (passwords are 'password123' hashed with bcrypt, 10 rounds)
 INSERT INTO Users (username, email, password_hash) VALUES
 ('john_doe', 'john@example.com', '$2b$10$nO7p7oT8F2B.E9y.E9y.EeQ7a19rV9u9v9v9v9v9v9v9v9v9v9v'), -- Mock hash for password123
@@ -33,8 +25,3 @@ INSERT INTO Users (username, email, password_hash) VALUES
 INSERT INTO Addresses (user_id, street, city, state, zip) VALUES
 (1, '123 Main St', 'Anytown', 'CA', '12345'),
 (2, '456 Oak Ave', 'Somewhere', 'NY', '67890');
-
--- Insert Coupons
-INSERT INTO Coupons (code, discount_type, discount_value, expiry_date, usage_limit) VALUES
-('SAVE10', 'percentage', 10.00, '2026-12-31', 100),
-('FIXED20', 'fixed', 20.00, '2026-12-31', 50);

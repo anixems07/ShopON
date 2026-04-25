@@ -43,21 +43,13 @@ CREATE TABLE Products (
     CONSTRAINT chk_no_garden_hose CHECK (name <> 'Garden Hose')
 );
 
--- Inventory Table
-CREATE TABLE Inventory (
-    inventory_id INT AUTO_INCREMENT PRIMARY KEY,
-    product_id INT UNIQUE NOT NULL,
-    quantity INT NOT NULL DEFAULT 0 CHECK (quantity >= 0),
-    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE
-);
-
 -- Orders Table
 CREATE TABLE Orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total_amount DECIMAL(10,2) NOT NULL,
+    payment_method ENUM('COD', 'CARD', 'UPI') NOT NULL,
     status ENUM('pending', 'confirmed', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending',
     address_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
@@ -73,18 +65,6 @@ CREATE TABLE Order_Items (
     price DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES Products(product_id)
-);
-
--- Payments Table
-CREATE TABLE Payments (
-    payment_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT UNIQUE NOT NULL,
-    payment_method ENUM('credit_card', 'debit_card', 'paypal', 'bank_transfer', 'cash_on_delivery') NOT NULL,
-    payment_provider VARCHAR(100),
-    amount DECIMAL(10,2) NOT NULL,
-    status ENUM('pending', 'completed', 'failed') DEFAULT 'pending',
-    transaction_id VARCHAR(255),
-    FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE
 );
 
 -- Reviews Table
@@ -112,70 +92,11 @@ CREATE TABLE Cart (
     UNIQUE (user_id, product_id)
 );
 
--- Wishlist Table
-CREATE TABLE Wishlist (
-    wishlist_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    product_id INT NOT NULL,
-    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE,
-    UNIQUE (user_id, product_id)
-);
-
--- Coupons Table
-CREATE TABLE Coupons (
-    coupon_id INT AUTO_INCREMENT PRIMARY KEY,
-    code VARCHAR(50) UNIQUE NOT NULL,
-    discount_type ENUM('percentage', 'fixed') NOT NULL,
-    discount_value DECIMAL(10,2) NOT NULL,
-    expiry_date DATE NOT NULL,
-    usage_limit INT DEFAULT NULL
-);
-
--- Coupon_Usage Table
-CREATE TABLE Coupon_Usage (
-    usage_id INT AUTO_INCREMENT PRIMARY KEY,
-    coupon_id INT NOT NULL,
-    user_id INT NOT NULL,
-    order_id INT,
-    used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (coupon_id) REFERENCES Coupons(coupon_id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE SET NULL
-);
-
 -- Indexes for performance
 CREATE INDEX idx_products_category ON Products(category_id);
 CREATE INDEX idx_orders_user ON Orders(user_id);
 CREATE INDEX idx_order_items_order ON Order_Items(order_id);
 CREATE INDEX idx_cart_user ON Cart(user_id);
-CREATE INDEX idx_wishlist_user ON Wishlist(user_id);
-
--- Triggers
-DELIMITER //
-
--- Trigger to update inventory after order item insert
-CREATE TRIGGER update_inventory_after_order
-AFTER INSERT ON Order_Items
-FOR EACH ROW
-BEGIN
-    UPDATE Inventory SET quantity = quantity - NEW.quantity WHERE product_id = NEW.product_id;
-END //
-
--- Trigger to check stock before inserting order item
-CREATE TRIGGER check_stock_before_order
-BEFORE INSERT ON Order_Items
-FOR EACH ROW
-BEGIN
-    DECLARE stock INT;
-    SELECT quantity INTO stock FROM Inventory WHERE product_id = NEW.product_id;
-    IF stock < NEW.quantity THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insufficient stock';
-    END IF;
-END //
-
-DELIMITER ;
 
 -- Views
 -- Top Products View
@@ -199,7 +120,8 @@ DELIMITER //
 -- PlaceOrder Stored Procedure
 CREATE PROCEDURE PlaceOrder(
     IN p_user_id INT,
-    IN p_address_id INT
+    IN p_address_id INT,
+    IN p_payment_method ENUM('COD', 'CARD', 'UPI')
 )
 BEGIN
     DECLARE total DECIMAL(10,2) DEFAULT 0;
@@ -214,9 +136,14 @@ BEGIN
     IF total IS NULL THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cart is empty';
     END IF;
+
+    IF p_payment_method IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Payment method is required';
+    END IF;
     
     -- Insert order
-    INSERT INTO Orders (user_id, total_amount, address_id) VALUES (p_user_id, total, p_address_id);
+    INSERT INTO Orders (user_id, total_amount, address_id, payment_method, status)
+    VALUES (p_user_id, total, p_address_id, p_payment_method, 'confirmed');
     SET order_id = LAST_INSERT_ID();
     
     -- Insert order items from cart
@@ -231,31 +158,6 @@ BEGIN
     
     -- Return order_id
     SELECT order_id AS order_id;
-END //
-
--- ProcessPayment Stored Procedure
-CREATE PROCEDURE ProcessPayment(
-    IN p_order_id INT,
-    IN p_payment_method ENUM('credit_card', 'debit_card', 'paypal', 'bank_transfer'),
-    IN p_payment_provider VARCHAR(100),
-    IN p_amount DECIMAL(10,2)
-)
-BEGIN
-    DECLARE order_total DECIMAL(10,2);
-    
-    -- Get order total
-    SELECT total_amount INTO order_total FROM Orders WHERE order_id = p_order_id;
-    
-    IF order_total != p_amount THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Payment amount mismatch';
-    END IF;
-    
-    -- Insert payment
-    INSERT INTO Payments (order_id, payment_method, payment_provider, amount, status, transaction_id)
-    VALUES (p_order_id, p_payment_method, p_payment_provider, p_amount, 'completed', CONCAT('TXN', p_order_id));
-    
-    -- Update order status
-    UPDATE Orders SET status = 'confirmed' WHERE order_id = p_order_id;
 END //
 
 DELIMITER ;

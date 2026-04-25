@@ -5,17 +5,27 @@ export default (db, authenticateToken) => {
 
   router.use(authenticateToken);
 
-  // POST /orders/place — call stored procedure to place order & process payment
+  // POST /orders/place — place an order using the cart contents
   router.post('/place', async (req, res) => {
-    const { address_id, payment_method, payment_provider, card_details } = req.body;
+    const { address_id, payment_method, card_details } = req.body;
     const user_id = req.user.user_id;
+    const paymentMethodMap = {
+      cash_on_delivery: 'COD',
+      CARD: 'CARD',
+      online_upi: 'UPI'
+    };
+    const normalizedPaymentMethod = paymentMethodMap[payment_method] || payment_method;
 
     if (!address_id || !payment_method) {
       return res.status(400).json({ error: 'address_id and payment_method are required.' });
     }
 
+    if (!['COD', 'CARD', 'UPI'].includes(normalizedPaymentMethod)) {
+      return res.status(400).json({ error: 'payment_method must be one of COD, CARD, or UPI.' });
+    }
+
     // Basic Validation for CARD payment
-    if (payment_method === 'CARD') {
+    if (normalizedPaymentMethod === 'CARD') {
       if (!card_details || !card_details.cardNumber || !card_details.cardHolder || !card_details.expiry || !card_details.cvv) {
         return res.status(400).json({ error: 'All card details are required for CARD payment.' });
       }
@@ -27,32 +37,8 @@ export default (db, authenticateToken) => {
 
     try {
       // Call PlaceOrder stored procedure
-      const [orderResult] = await db.execute('CALL PlaceOrder(?, ?)', [user_id, address_id]);
+      const [orderResult] = await db.execute('CALL PlaceOrder(?, ?, ?)', [user_id, address_id, normalizedPaymentMethod]);
       const order_id = orderResult[0][0].order_id;
-
-      // Fetch total amount from the created order
-      const [orderRows] = await db.execute(
-        'SELECT total_amount FROM Orders WHERE order_id = ?',
-        [order_id]
-      );
-
-      if (orderRows.length === 0) {
-        return res.status(500).json({ error: 'Order was created but could not be retrieved.' });
-      }
-
-      const total_amount = orderRows[0].total_amount;
-
-      // Handle payment provider for CARD (mask card number)
-      let finalPaymentProvider = payment_provider || null;
-      if (payment_method === 'CARD' && card_details) {
-        finalPaymentProvider = `Card ending in ${card_details.cardNumber.slice(-4)}`;
-      }
-
-      // Call ProcessPayment stored procedure
-      await db.execute(
-        'CALL ProcessPayment(?, ?, ?, ?)',
-        [order_id, payment_method, finalPaymentProvider, total_amount]
-      );
 
       res.status(201).json({ message: 'Order placed successfully.', order_id });
     } catch (error) {
@@ -66,7 +52,7 @@ export default (db, authenticateToken) => {
     const user_id = req.user.user_id;
     try {
       const [rows] = await db.execute(
-        `SELECT o.order_id, o.order_date, o.status, o.total_amount,
+        `SELECT o.order_id, o.order_date, o.status, o.total_amount, o.payment_method,
                 a.street, a.city, a.state, a.zip
          FROM Orders o
          LEFT JOIN Addresses a ON o.address_id = a.address_id
