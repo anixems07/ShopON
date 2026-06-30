@@ -1,4 +1,4 @@
-﻿# ShopON - Online Shopping System
+﻿# ShopON - Online Shopping Application
  
 A full-stack e-commerce application built with Node.js, Express, MySQL, and vanilla JavaScript.
 
